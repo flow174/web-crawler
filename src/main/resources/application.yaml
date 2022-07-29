@@ -1,0 +1,10 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+config:
+  crawl:
+    maxUrlNum: 10
+    deepLevel: 1
+    timeOutSecond: 20
