@@ -58,4 +58,4 @@ When you get the docker image you can run with below command:
 * Crawl web content logic needs to be improved
 * When crawl the web content, we can specify specific element tag, attributes, and class name
 * The crawled page data we can save in to database, currently saved in memory, it is not a good way, and even I didn't provide a clean method
-* Fuzzy queries are not supported
+* High concurrent requests not support

@@ -1,6 +1,8 @@
 package com.beck.crawler.service;
 
+import com.beck.crawler.component.ISearcher;
 import com.beck.crawler.component.PageDataContainer;
+import com.beck.crawler.component.impl.DefaultSearcher;
 import com.beck.crawler.exception.NoSuchQueryIdException;
 import com.beck.crawler.model.PageData;
 import com.beck.crawler.model.rtmap.QueryRequest;
@@ -45,7 +47,9 @@ class QueryServiceTest {
     PageDataContainer pageDataContainer = new PageDataContainer();
     pageDataContainer.put(queryId, pageDataMap);
 
-    this.queryService = new QueryService(pageDataContainer);
+    ISearcher searcher = new DefaultSearcher();
+
+    this.queryService = new QueryService(pageDataContainer, searcher);
   }
 
   @Test
@@ -56,7 +60,7 @@ class QueryServiceTest {
     queryRequest.setSearchText("Beck");
     var result = this.queryService.query(queryRequest);
 
-    Assertions.assertEquals(3, result.getQueryResultMap().size());
+    Assertions.assertEquals(3, result.getQueryResults().size());
   }
 
   @Test
@@ -67,7 +71,7 @@ class QueryServiceTest {
     queryRequest.setSearchText("Daniel");
     var result = this.queryService.query(queryRequest);
 
-    Assertions.assertEquals(0, result.getQueryResultMap().size());
+    Assertions.assertEquals(0, result.getQueryResults().size());
   }
 
   @Test

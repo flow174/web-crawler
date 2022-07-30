@@ -1,6 +1,7 @@
 package com.beck.crawler.model.rtmap;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Map.Entry;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,6 @@ import lombok.Data;
 @Builder
 public class QueryResponse {
 
-  Map<String, String> queryResultMap;
+  List<Entry<String, String>> queryResults;
 
 }
