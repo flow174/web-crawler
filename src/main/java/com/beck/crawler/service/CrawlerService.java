@@ -47,7 +47,7 @@ public class CrawlerService {
     requestValidate(request);
 
     var queryId = createQueryId();
-    var crawlWorkers = getCrawlFutures(request);
+    var crawlWorkers = exercise(request);
     var resultMap = extract(crawlWorkers);
 
     pageDataContainer.put(queryId, resultMap);
@@ -55,16 +55,7 @@ public class CrawlerService {
     return createResponse(queryId, resultMap);
   }
 
-  private Map<String, PageData> extract(Map<String, Future<Map<String, PageData>>> crawlWorkers) {
-    Map<String, PageData> crawlResultMap = new HashMap<>();
-    for (var entity : crawlWorkers.entrySet()) {
-      var oneResult = getExecutionTaskResult(entity.getValue());
-      crawlResultMap.putAll(oneResult);
-    }
-    return crawlResultMap;
-  }
-
-  private Map<String, Future<Map<String, PageData>>> getCrawlFutures(CrawlRequest request) {
+  private Map<String, Future<Map<String, PageData>>> exercise(CrawlRequest request) {
     Map<String, Future<Map<String, PageData>>> crawlWorkers = new HashMap<>();
     CountDownLatch latch = new CountDownLatch(request.getUrls().size());
 
@@ -77,6 +68,23 @@ public class CrawlerService {
     return crawlWorkers;
   }
 
+  private void waitingForTheCrawlToFinish(CountDownLatch latch) {
+    try {
+      latch.await();
+    } catch (InterruptedException exception) {
+      throw new CrawlTaskInterruptedException();
+    }
+  }
+
+  private Map<String, PageData> extract(Map<String, Future<Map<String, PageData>>> crawlWorkers) {
+    Map<String, PageData> crawlResultMap = new HashMap<>();
+    for (var entity : crawlWorkers.entrySet()) {
+      var oneResult = getExecutionTaskResult(entity.getValue());
+      crawlResultMap.putAll(oneResult);
+    }
+    return crawlResultMap;
+  }
+
   private void requestValidate(CrawlRequest request) {
     if (request.getUrls().size() > config.getMaxUrlNum()) {
       throw new OverLimitedURLNumberException(config.getMaxUrlNum());
@@ -86,14 +94,6 @@ public class CrawlerService {
       if (!CrawlUtils.getInstance().isValidLink(url)) {
         throw new InvalidURLException(url);
       }
-    }
-  }
-
-  private void waitingForTheCrawlToFinish(CountDownLatch latch) {
-    try {
-      latch.await();
-    } catch (InterruptedException exception) {
-      throw new CrawlTaskInterruptedException();
     }
   }
 

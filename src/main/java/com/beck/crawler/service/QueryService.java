@@ -22,11 +22,15 @@ public class QueryService {
 
   // provide query function
   public QueryResponse query(QueryRequest request) {
+
     var pageDataMap = pageDataContainer.get(request.getQueryId());
-    return createQueryResponse(request.getSearchText(), pageDataMap);
+
+    Map<String, String> queryResultMap = search(request.getSearchText(), pageDataMap);
+
+    return QueryResponse.builder().queryResultMap(queryResultMap).build();
   }
 
-  private QueryResponse createQueryResponse(String queryText, Map<String, PageData> resultMap) {
+  private Map<String, String> search(String queryText, Map<String, PageData> resultMap) {
     Map<String, String> queryResultMap = new HashMap<>();
     for (var entity : resultMap.entrySet()) {
       if (Objects.isNull(entity.getValue())) {
@@ -39,7 +43,6 @@ public class QueryService {
         }
       }
     }
-
-    return QueryResponse.builder().queryResultMap(queryResultMap).build();
+    return queryResultMap;
   }
 }

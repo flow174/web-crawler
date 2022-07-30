@@ -29,8 +29,11 @@ import org.jsoup.select.Elements;
 public class CrawlWorker implements Callable<Map<String, PageData>> {
 
   private final String url;
+
   private final CrawlerConfig config;
+
   private final CountDownLatch latch;
+
   private final Map<String, PageData> resultMap;
 
   public CrawlWorker(String url, CrawlerConfig config, CountDownLatch latch) {
@@ -42,10 +45,11 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
 
   @Override
   public Map<String, PageData> call() {
+
     int deep = config.getDeepLevel();
     process(url, deep);
 
-    publishTaskFinish();
+    finish();
 
     return resultMap;
   }
@@ -102,10 +106,8 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     Elements elements = document.getElementsByTag(TAG_NAME_A);
     for (Element element : elements) {
       String link = element.attr(ATTRIBUTE_KEY_HREF);
-      if (CrawlUtils.getInstance().isValidLink(link)) {
-        if (!resultMap.containsKey(link)) {
-          process(link, deep);
-        }
+      if (CrawlUtils.getInstance().isValidLink(link) && !resultMap.containsKey(link)) {
+        process(link, deep);
       }
     }
   }
@@ -123,20 +125,18 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
       return;
     }
 
+    // tag p special handle
     if (element.tag().getName().equals(TAG_NAME_P)) {
       var text = element.text();
-      if (!text.isEmpty()) {
-        contents.add(text);
-      }
+      contents.add(text);
       return;
     }
 
+    // save the content only when element has no children
     var children = element.children();
     if (children.isEmpty()) {
       var text = element.text();
-      if (!text.isEmpty()) {
-        contents.add(text);
-      }
+      contents.add(text);
     } else {
       for (var child : children) {
         parseElement(child, contents);
@@ -168,7 +168,7 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     return USER_AGENTS[n];
   }
 
-  private void publishTaskFinish() {
+  private void finish() {
     latch.countDown();
   }
 }
