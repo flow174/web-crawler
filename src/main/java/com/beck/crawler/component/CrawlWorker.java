@@ -1,13 +1,16 @@
 package com.beck.crawler.component;
 
-import static com.beck.crawler.common.Constant.HEADERS;
+import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_HREF;
+import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_STYLE;
+import static com.beck.crawler.common.Constant.ATTRIBUTE_VALUE_DISPLAY_NONE;
+import static com.beck.crawler.common.Constant.USER_AGENTS;
+import static com.beck.crawler.common.Constant.TAG_NAME_A;
+import static com.beck.crawler.common.Constant.TAG_NAME_P;
+import static com.beck.crawler.common.Constant.TAG_NAME_SCRIPT;
 
 import com.beck.crawler.config.CrawlerConfig;
-import com.beck.crawler.exception.BaseApplicationException;
-import com.beck.crawler.exception.ReadWebsiteException;
 import com.beck.crawler.model.PageData;
 import com.beck.crawler.utils.CrawlUtils;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +19,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import javax.print.Doc;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,6 +27,7 @@ import org.jsoup.select.Elements;
 
 @Slf4j
 public class CrawlWorker implements Callable<Map<String, PageData>> {
+
 
   private final String url;
   private final CrawlerConfig config;
@@ -44,7 +47,7 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     int deep = config.getDeepLevel();
     process(url, deep);
 
-    finish();
+    publishTaskFinish();
 
     return resultMap;
 
@@ -55,8 +58,7 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
 
     // get web site content
     Document document = getDocument(url);
-
-    if(Objects.isNull(document)) {
+    if (Objects.isNull(document)) {
       resultMap.put(url, null);
       return;
     }
@@ -99,9 +101,9 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
   }
 
   private void deepParse(Document document, int deep) {
-    Elements elements = document.getElementsByTag("a");
+    Elements elements = document.getElementsByTag(TAG_NAME_A);
     for (Element element : elements) {
-      String link = element.attr("href");
+      String link = element.attr(ATTRIBUTE_KEY_HREF);
       if (CrawlUtils.getInstance().isValidLink(link)) {
         if (!resultMap.containsKey(link)) {
           process(link, deep);
@@ -119,11 +121,11 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
   }
 
   private void parseElement(Element element, Set<String> contents) {
-    if (needSkipSpecialElement(element)) {
+    if (skipSpecialElement(element)) {
       return;
     }
 
-    if(element.tag().getName().equals("p")) {
+    if (element.tag().getName().equals(TAG_NAME_P)) {
       var text = element.text();
       if (!text.isEmpty()) {
         contents.add(text);
@@ -144,16 +146,14 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     }
   }
 
-  private boolean needSkipSpecialElement(Element element) {
-    return element.attr("style").contains("display:none") || element.tag().getName().equals("script");
+  private boolean skipSpecialElement(Element element) {
+    return element.attr(ATTRIBUTE_KEY_STYLE).contains(ATTRIBUTE_VALUE_DISPLAY_NONE)
+        || element.tag().getName().equals(TAG_NAME_SCRIPT);
   }
 
   private Map<String, String> createRandomHeader() {
-    Random r = new Random();
-    int n = r.nextInt(HEADERS.length);
-
     Map<String, String> headerMap = new HashMap<>();
-    headerMap.put("User-Agent", HEADERS[n]);
+    headerMap.put("User-Agent", getRandomUserAgent());
     headerMap.put("Accept-Language", "en-US,en;q=0.9");
     headerMap.put("Cache-Control", "no-cache");
     headerMap.put("Pragma", "no-cache");
@@ -163,7 +163,13 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     return headerMap;
   }
 
-  private void finish() {
+  private String getRandomUserAgent() {
+    Random random = new Random();
+    int n = random.nextInt(USER_AGENTS.length);
+    return USER_AGENTS[n];
+  }
+
+  private void publishTaskFinish() {
     latch.countDown();
   }
 }

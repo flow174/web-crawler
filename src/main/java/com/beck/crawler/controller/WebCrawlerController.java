@@ -21,12 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1")
 @RestController
 @Slf4j
-@Validated
 public class WebCrawlerController {
 
-  final CrawlerService crawlerService;
+  private final CrawlerService crawlerService;
 
-  final QueryService queryService;
+  private final QueryService queryService;
 
   public WebCrawlerController(CrawlerService crawlerService, QueryService queryService) {
     this.crawlerService = crawlerService;
@@ -35,13 +34,13 @@ public class WebCrawlerController {
 
   @ApiOperation(value = "This API is used to crawl specified web site")
   @PostMapping(value = {"/crawl"}, produces = APPLICATION_JSON_UTF8_VALUE)
-  public CrawlResponse craw(@RequestBody CrawlRequest request) {
+  public CrawlResponse craw(@RequestBody @Validated CrawlRequest request) {
     return crawlerService.crawl(request);
   }
 
   @ApiOperation(value = "This API is used to query specified key words")
   @PostMapping(value = {"/query"}, produces = APPLICATION_JSON_UTF8_VALUE)
-  public QueryResponse query(@RequestBody QueryRequest request) {
+  public QueryResponse query(@RequestBody @Validated QueryRequest request) {
     return queryService.query(request);
   }
 

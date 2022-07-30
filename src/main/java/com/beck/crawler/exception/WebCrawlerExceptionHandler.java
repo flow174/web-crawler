@@ -1,9 +1,12 @@
 package com.beck.crawler.exception;
 
+import java.rmi.UnexpectedException;
+import javax.validation.UnexpectedTypeException;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,6 +44,26 @@ public class WebCrawlerExceptionHandler {
     } else {
       return ErrorBody.builder().message("Internal server error.").build();
     }
+  }
+
+  @ExceptionHandler({MethodArgumentNotValidException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  ErrorBody handlerArgumentNotValidException(MethodArgumentNotValidException e) {
+    return ErrorBody.builder()
+        .errorCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  @ExceptionHandler({UnexpectedException.class, UnexpectedTypeException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  ErrorBody handlerUnexpectedTypeException(UnexpectedTypeException e) {
+    return ErrorBody.builder()
+        .errorCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   @ExceptionHandler({Throwable.class})

@@ -7,11 +7,14 @@ public final class Constant {
 
   public final static String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
 
-  public final static String ACCOUNT_BALANCE_NOT_ENOUGH = "Account balance not enough.";
+  public static final String TAG_NAME_A = "a";
+  public static final String TAG_NAME_P = "p";
+  public static final String TAG_NAME_SCRIPT = "script";
+  public static final String ATTRIBUTE_KEY_HREF = "href";
+  public static final String ATTRIBUTE_KEY_STYLE = "style";
+  public static final String ATTRIBUTE_VALUE_DISPLAY_NONE = "display:none";
 
-  public final static String ACCOUNT_NOT_EXIST = "Account not exist.";
-
-  public final static String[] HEADERS = {
+  public final static String[] USER_AGENTS = {
       "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
       "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
       "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",

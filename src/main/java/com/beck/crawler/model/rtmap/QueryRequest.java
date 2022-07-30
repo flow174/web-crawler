@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class QueryRequest {
 
-  @NotEmpty
+  @NotEmpty(message = "query id cannot be empty")
   private String queryId;
 
-  @NotEmpty
+  @NotEmpty(message = "search text cannot be empty")
   private String searchText;
 
 }

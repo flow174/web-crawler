@@ -4,9 +4,11 @@ import com.beck.crawler.component.CrawlWorker;
 import com.beck.crawler.component.PageDataContainer;
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.exception.CrawlTaskInterruptedException;
+import com.beck.crawler.exception.InvalidURLException;
 import com.beck.crawler.model.PageData;
 import com.beck.crawler.model.rtmap.CrawlRequest;
 import com.beck.crawler.model.rtmap.CrawlResponse;
+import com.beck.crawler.utils.CrawlUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -37,18 +39,20 @@ public class CrawlerService {
 
   public CrawlResponse crawl(CrawlRequest request) {
 
+    requestValidate(request);
+
     var queryId = createQueryId();
 
     var crawlWorkers = getCrawlFutures(request);
 
-    var resultMap = extracted(crawlWorkers);
+    var resultMap = extract(crawlWorkers);
 
     pageDataContainer.put(queryId, resultMap);
 
     return createResponse(queryId, resultMap);
   }
 
-  private Map<String, PageData> extracted(Map<String, Future<Map<String, PageData>>> crawlWorkers) {
+  private Map<String, PageData> extract(Map<String, Future<Map<String, PageData>>> crawlWorkers) {
     Map<String, PageData> crawlResultMap = new HashMap<>();
     for (var entity : crawlWorkers.entrySet()) {
       var oneResult = getExecutionTaskResult(entity.getValue());
@@ -61,13 +65,21 @@ public class CrawlerService {
     Map<String, Future<Map<String, PageData>>> crawlWorkers = new HashMap<>();
     CountDownLatch latch = new CountDownLatch(request.getUrls().size());
 
-    for (String url : request.getUrls()) {
+    for (var url : request.getUrls()) {
       crawlWorkers.put(url, executorService.submit(new CrawlWorker(url, config, latch)));
     }
 
     waitingForTheCrawlToFinish(latch);
 
     return crawlWorkers;
+  }
+
+  private void requestValidate(CrawlRequest request) {
+    for (var url : request.getUrls()) {
+      if (!CrawlUtils.getInstance().isValidLink(url)) {
+        throw new InvalidURLException(url);
+      }
+    }
   }
 
   private void waitingForTheCrawlToFinish(CountDownLatch latch) {
