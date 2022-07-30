@@ -20,6 +20,7 @@ public class QueryService {
     this.pageDataContainer = pageDataContainer;
   }
 
+  // provide query function
   public QueryResponse query(QueryRequest request) {
     var pageDataMap = pageDataContainer.get(request.getQueryId());
     return createQueryResponse(request.getSearchText(), pageDataMap);
@@ -27,18 +28,18 @@ public class QueryService {
 
   private QueryResponse createQueryResponse(String queryText, Map<String, PageData> resultMap) {
     Map<String, String> queryResultMap = new HashMap<>();
-    if (!resultMap.isEmpty()) {
-      for (var entity : resultMap.entrySet()) {
-        if(Objects.isNull(entity.getValue())){
-          continue;
-        }
-        for (var value : entity.getValue().getContent()) {
-          if (value.contains(queryText)) {
-            queryResultMap.put(value, entity.getKey());
-          }
+    for (var entity : resultMap.entrySet()) {
+      if (Objects.isNull(entity.getValue())) {
+        continue;
+      }
+
+      for (var value : entity.getValue().getContent()) {
+        if (value.contains(queryText)) {
+          queryResultMap.put(value, entity.getKey());
         }
       }
     }
+
     return QueryResponse.builder().queryResultMap(queryResultMap).build();
   }
 }

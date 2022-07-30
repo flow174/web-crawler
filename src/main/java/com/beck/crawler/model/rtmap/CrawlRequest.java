@@ -2,9 +2,11 @@ package com.beck.crawler.model.rtmap;
 
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class CrawlRequest {
 
   @NotEmpty(message = "URL cannot be empty")

@@ -2,8 +2,8 @@ package com.beck.crawler.controller;
 
 import static com.beck.crawler.common.Constant.APPLICATION_JSON_UTF8_VALUE;
 
-import com.beck.crawler.model.rtmap.CrawlResponse;
 import com.beck.crawler.model.rtmap.CrawlRequest;
+import com.beck.crawler.model.rtmap.CrawlResponse;
 import com.beck.crawler.model.rtmap.QueryRequest;
 import com.beck.crawler.model.rtmap.QueryResponse;
 import com.beck.crawler.service.CrawlerService;
@@ -32,12 +32,24 @@ public class WebCrawlerController {
     this.queryService = queryService;
   }
 
+  /**
+   * crawl specified urls
+   *
+   * @param request web crawler request, include urls
+   * @return web crawler status with a query id
+   */
   @ApiOperation(value = "This API is used to crawl specified web site")
   @PostMapping(value = {"/crawl"}, produces = APPLICATION_JSON_UTF8_VALUE)
   public CrawlResponse craw(@RequestBody @Validated CrawlRequest request) {
     return crawlerService.crawl(request);
   }
 
+  /**
+   * query contents from crawled urls with query id
+   *
+   * @param request query request
+   * @return contents with url
+   */
   @ApiOperation(value = "This API is used to query specified key words")
   @PostMapping(value = {"/query"}, produces = APPLICATION_JSON_UTF8_VALUE)
   public QueryResponse query(@RequestBody @Validated QueryRequest request) {

@@ -1,10 +1,14 @@
 package com.beck.crawler.service;
 
+import static com.beck.crawler.common.Constant.CRAWL_FAILED;
+import static com.beck.crawler.common.Constant.CRAWL_SUCCESS;
+
 import com.beck.crawler.component.CrawlWorker;
 import com.beck.crawler.component.PageDataContainer;
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.exception.CrawlTaskInterruptedException;
 import com.beck.crawler.exception.InvalidURLException;
+import com.beck.crawler.exception.OverLimitedURLNumberException;
 import com.beck.crawler.model.PageData;
 import com.beck.crawler.model.rtmap.CrawlRequest;
 import com.beck.crawler.model.rtmap.CrawlResponse;
@@ -37,14 +41,13 @@ public class CrawlerService {
     this.executorService = Executors.newFixedThreadPool(10);
   }
 
+  // Provide crawl function
   public CrawlResponse crawl(CrawlRequest request) {
 
     requestValidate(request);
 
     var queryId = createQueryId();
-
     var crawlWorkers = getCrawlFutures(request);
-
     var resultMap = extract(crawlWorkers);
 
     pageDataContainer.put(queryId, resultMap);
@@ -75,6 +78,10 @@ public class CrawlerService {
   }
 
   private void requestValidate(CrawlRequest request) {
+    if (request.getUrls().size() > config.getMaxUrlNum()) {
+      throw new OverLimitedURLNumberException(config.getMaxUrlNum());
+    }
+
     for (var url : request.getUrls()) {
       if (!CrawlUtils.getInstance().isValidLink(url)) {
         throw new InvalidURLException(url);
@@ -105,9 +112,9 @@ public class CrawlerService {
     Map<String, String> stateMap = new HashMap<>();
     for (var entity : crawlResultMap.entrySet()) {
       if (Objects.isNull(entity.getValue())) {
-        stateMap.put(entity.getKey(), "crawl failed");
+        stateMap.put(entity.getKey(), CRAWL_FAILED);
       } else {
-        stateMap.put(entity.getKey(), "crawl success");
+        stateMap.put(entity.getKey(), CRAWL_SUCCESS);
       }
     }
     return CrawlResponse.builder().queryId(queryId).stateMap(stateMap).build();

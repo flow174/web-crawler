@@ -13,6 +13,8 @@ public final class Constant {
   public static final String ATTRIBUTE_KEY_HREF = "href";
   public static final String ATTRIBUTE_KEY_STYLE = "style";
   public static final String ATTRIBUTE_VALUE_DISPLAY_NONE = "display:none";
+  public static final String CRAWL_FAILED = "crawl failed";
+  public static final String CRAWL_SUCCESS = "crawl success";
 
   public final static String[] USER_AGENTS = {
       "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",

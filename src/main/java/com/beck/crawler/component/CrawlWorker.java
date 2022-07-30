@@ -3,10 +3,10 @@ package com.beck.crawler.component;
 import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_HREF;
 import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_STYLE;
 import static com.beck.crawler.common.Constant.ATTRIBUTE_VALUE_DISPLAY_NONE;
-import static com.beck.crawler.common.Constant.USER_AGENTS;
 import static com.beck.crawler.common.Constant.TAG_NAME_A;
 import static com.beck.crawler.common.Constant.TAG_NAME_P;
 import static com.beck.crawler.common.Constant.TAG_NAME_SCRIPT;
+import static com.beck.crawler.common.Constant.USER_AGENTS;
 
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.model.PageData;
@@ -28,7 +28,6 @@ import org.jsoup.select.Elements;
 @Slf4j
 public class CrawlWorker implements Callable<Map<String, PageData>> {
 
-
   private final String url;
   private final CrawlerConfig config;
   private final CountDownLatch latch;
@@ -43,14 +42,12 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
 
   @Override
   public Map<String, PageData> call() {
-
     int deep = config.getDeepLevel();
     process(url, deep);
 
     publishTaskFinish();
 
     return resultMap;
-
   }
 
   private void process(String url, int deep) {
@@ -93,10 +90,11 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
   }
 
   private void parse(Document document, String url) {
-    PageData data = new PageData();
-    data.setHost(url);
-    data.setTitle(document.title());
-    data.setContent(extractContentData(document));
+    PageData data = PageData.builder()
+        .host(url)
+        .title(document.title())
+        .content(extractContentData(document))
+        .build();
     resultMap.put(url, data);
   }
 
@@ -151,6 +149,7 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
         || element.tag().getName().equals(TAG_NAME_SCRIPT);
   }
 
+  // Generate a random header
   private Map<String, String> createRandomHeader() {
     Map<String, String> headerMap = new HashMap<>();
     headerMap.put("User-Agent", getRandomUserAgent());
