@@ -35,7 +35,8 @@ class CrawlerServiceTest {
   @DisplayName("Specified over limited URL")
   void case1() {
     List<String> urls = List.of("https://www.google.com", "https://www.javatpoint.com", "https://stackoverflow.blog/");
-    CrawlRequest crawlRequest = CrawlRequest.builder().urls(urls).build();
+    CrawlRequest crawlRequest = new CrawlRequest();
+    crawlRequest.setUrls(urls);
     Assertions.assertThrows(OverLimitedURLNumberException.class, () -> this.crawlerService.crawl(crawlRequest));
   }
 
@@ -43,7 +44,8 @@ class CrawlerServiceTest {
   @DisplayName("Invalid URL")
   void case2() {
     List<String> urls = List.of("stackoverflow.blog/", "https://www.javatpoint.com");
-    CrawlRequest crawlRequest = CrawlRequest.builder().urls(urls).build();
+    CrawlRequest crawlRequest = new CrawlRequest();
+    crawlRequest.setUrls(urls);
     Assertions.assertThrows(InvalidURLException.class, () -> this.crawlerService.crawl(crawlRequest));
   }
 
@@ -52,7 +54,8 @@ class CrawlerServiceTest {
   void case3() {
     String fakeUrl = "https://thisisafakewebsiteformytest.com";
     List<String> urls = List.of(fakeUrl);
-    CrawlRequest crawlRequest = CrawlRequest.builder().urls(urls).build();
+    CrawlRequest crawlRequest = new CrawlRequest();
+    crawlRequest.setUrls(urls);
     var result = this.crawlerService.crawl(crawlRequest);
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getStateMap().size());
@@ -65,7 +68,8 @@ class CrawlerServiceTest {
     // cannot make sure this url always valid, just an example, furthermore we can use mock
     String url = "https://stackoverflow.blog/";
     List<String> urls = List.of(url);
-    CrawlRequest crawlRequest = CrawlRequest.builder().urls(urls).build();
+    CrawlRequest crawlRequest = new CrawlRequest();
+    crawlRequest.setUrls(urls);
     var result = this.crawlerService.crawl(crawlRequest);
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getStateMap().size());

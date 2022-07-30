@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class QueryRequest {
 
   @NotEmpty(message = "query id cannot be empty")

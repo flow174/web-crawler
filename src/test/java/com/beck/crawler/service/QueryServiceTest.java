@@ -51,7 +51,9 @@ class QueryServiceTest {
   @Test
   @DisplayName("query content with happy pass")
   void case1() {
-    QueryRequest queryRequest = QueryRequest.builder().queryId("query1").searchText("Beck").build();
+    QueryRequest queryRequest = new QueryRequest();
+    queryRequest.setQueryId("query1");
+    queryRequest.setSearchText("Beck");
     var result = this.queryService.query(queryRequest);
 
     Assertions.assertEquals(3, result.getQueryResultMap().size());
@@ -60,7 +62,9 @@ class QueryServiceTest {
   @Test
   @DisplayName("query content with nothing")
   void case2() {
-    QueryRequest queryRequest = QueryRequest.builder().queryId("query1").searchText("Daniel").build();
+    QueryRequest queryRequest = new QueryRequest();
+    queryRequest.setQueryId("query1");
+    queryRequest.setSearchText("Daniel");
     var result = this.queryService.query(queryRequest);
 
     Assertions.assertEquals(0, result.getQueryResultMap().size());
@@ -69,7 +73,9 @@ class QueryServiceTest {
   @Test
   @DisplayName("no such query id exception")
   void case3() {
-    QueryRequest queryRequest = QueryRequest.builder().queryId("query2").searchText("Beck").build();
+    QueryRequest queryRequest = new QueryRequest();
+    queryRequest.setQueryId("query2");
+    queryRequest.setSearchText("Beck");
     Assertions.assertThrows(NoSuchQueryIdException.class, () -> this.queryService.query(queryRequest));
   }
 
