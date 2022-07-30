@@ -6,5 +6,5 @@ server:
 config:
   crawl:
     maxUrlNum: 10
-    deepLevel: 1
+    deepLevel: 0
     timeOutSecond: 20
