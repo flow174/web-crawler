@@ -51,6 +51,15 @@ When you get the docker image you can run with below command:
 
     docker run -d -p 8080:8080 beck/web-crawler-application:1.0
 
+## Example 
+
+Crawl (with deep 1)
+![img_4.png](imgs/img_4.png)
+![img_1.png](imgs/img_1.png)
+
+Search
+![img_2.png](imgs/img_2.png)
+![img_3.png](imgs/img_3.png)
 
 ## Drawback or future consideration
 
