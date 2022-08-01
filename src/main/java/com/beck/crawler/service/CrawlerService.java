@@ -4,6 +4,7 @@ import static com.beck.crawler.common.Constant.CRAWL_FAILED;
 import static com.beck.crawler.common.Constant.CRAWL_SUCCESS;
 
 import com.beck.crawler.component.CrawlWorker;
+import com.beck.crawler.component.IParser;
 import com.beck.crawler.component.PageDataContainer;
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.exception.CrawlTaskInterruptedException;
@@ -29,13 +30,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class CrawlerService {
 
+  private final IParser parser;
+
   private final CrawlerConfig config;
 
   private final ExecutorService executorService;
 
   private final PageDataContainer pageDataContainer;
 
-  public CrawlerService(CrawlerConfig config, PageDataContainer pageDataContainer) {
+  public CrawlerService(IParser parser, CrawlerConfig config, PageDataContainer pageDataContainer) {
+    this.parser = parser;
     this.config = config;
     this.pageDataContainer = pageDataContainer;
     this.executorService = Executors.newFixedThreadPool(10);
@@ -60,7 +64,7 @@ public class CrawlerService {
     CountDownLatch latch = new CountDownLatch(request.getUrls().size());
 
     for (var url : request.getUrls()) {
-      crawlWorkers.put(url, executorService.submit(new CrawlWorker(url, config, latch)));
+      crawlWorkers.put(url, executorService.submit(new CrawlWorker(url, parser, config, latch)));
     }
 
     waitingForTheCrawlToFinish(latch);

@@ -1,22 +1,16 @@
 package com.beck.crawler.component;
 
 import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_HREF;
-import static com.beck.crawler.common.Constant.ATTRIBUTE_KEY_STYLE;
-import static com.beck.crawler.common.Constant.ATTRIBUTE_VALUE_DISPLAY_NONE;
 import static com.beck.crawler.common.Constant.TAG_NAME_A;
-import static com.beck.crawler.common.Constant.TAG_NAME_P;
-import static com.beck.crawler.common.Constant.TAG_NAME_SCRIPT;
 import static com.beck.crawler.common.Constant.USER_AGENTS;
 
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.model.PageData;
 import com.beck.crawler.utils.CrawlUtils;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +24,17 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
 
   private final String url;
 
+  private final IParser parser;
+
   private final CrawlerConfig config;
 
   private final CountDownLatch latch;
 
   private final Map<String, PageData> resultMap;
 
-  public CrawlWorker(String url, CrawlerConfig config, CountDownLatch latch) {
+  public CrawlWorker(String url, IParser parser, CrawlerConfig config, CountDownLatch latch) {
     this.url = url;
+    this.parser = parser;
     this.config = config;
     this.latch = latch;
     this.resultMap = new HashMap<>();
@@ -97,7 +94,7 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
     PageData data = PageData.builder()
         .host(url)
         .title(document.title())
-        .content(extractContentData(document))
+        .content(parser.parse(document))
         .build();
     resultMap.put(url, data);
   }
@@ -110,43 +107,6 @@ public class CrawlWorker implements Callable<Map<String, PageData>> {
         process(link, deep);
       }
     }
-  }
-
-  private Set<String> extractContentData(Document res) {
-    Set<String> contents = new HashSet<>();
-    for (var child : res.body().children()) {
-      parseElement(child, contents);
-    }
-    return contents;
-  }
-
-  private void parseElement(Element element, Set<String> contents) {
-    if (skipSpecialElement(element)) {
-      return;
-    }
-
-    // tag p special handle
-    if (element.tag().getName().equals(TAG_NAME_P)) {
-      var text = element.text();
-      contents.add(text);
-      return;
-    }
-
-    // save the content only when element has no children
-    var children = element.children();
-    if (children.isEmpty()) {
-      var text = element.text();
-      contents.add(text);
-    } else {
-      for (var child : children) {
-        parseElement(child, contents);
-      }
-    }
-  }
-
-  private boolean skipSpecialElement(Element element) {
-    return element.attr(ATTRIBUTE_KEY_STYLE).contains(ATTRIBUTE_VALUE_DISPLAY_NONE)
-        || element.tag().getName().equals(TAG_NAME_SCRIPT);
   }
 
   // Generate a random header

@@ -1,7 +1,9 @@
 package com.beck.crawler.service;
 
 import com.beck.crawler.common.Constant;
+import com.beck.crawler.component.IParser;
 import com.beck.crawler.component.PageDataContainer;
+import com.beck.crawler.component.impl.DefaultParser;
 import com.beck.crawler.config.CrawlerConfig;
 import com.beck.crawler.exception.InvalidURLException;
 import com.beck.crawler.exception.OverLimitedURLNumberException;
@@ -26,9 +28,11 @@ class CrawlerServiceTest {
     config.setTimeOutSecond(30);
     config.setMaxUrlNum(2);
 
+    IParser parser = new DefaultParser();
+
     PageDataContainer pageDataContainer = new PageDataContainer();
 
-    this.crawlerService = new CrawlerService(config, pageDataContainer);
+    this.crawlerService = new CrawlerService(parser, config, pageDataContainer);
   }
 
   @Test
