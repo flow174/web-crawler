@@ -8,3 +8,11 @@ config:
     maxUrlNum: 10
     deepLevel: 0
     timeOutSecond: 20
+
+management:
+  server:
+    port: 9091
+  endpoints:
+    web:
+      exposure:
+        include: info,health,prometheus
