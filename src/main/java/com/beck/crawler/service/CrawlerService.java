@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,11 +37,14 @@ public class CrawlerService {
 
   private final PageDataContainer pageDataContainer;
 
-  public CrawlerService(IParser parser, CrawlerConfig config, PageDataContainer pageDataContainer) {
+  public CrawlerService(IParser parser,
+      CrawlerConfig config,
+      PageDataContainer pageDataContainer,
+      ExecutorService executorService) {
     this.parser = parser;
     this.config = config;
     this.pageDataContainer = pageDataContainer;
-    this.executorService = Executors.newFixedThreadPool(10);
+    this.executorService = executorService;
   }
 
   // Provide crawl function
